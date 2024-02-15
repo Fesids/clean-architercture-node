@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    env_file: ./.env
+
+    environment:
+      MONGO_INITDB_DATABASE: js_dashboard
+
+    ports:
+      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+
+    volumes:
+      - db:/data/db
+
+  app:
+    depends_on:
+      - mongodb
+    build: ./
+
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+
+    environment:
+      - MONGODB_URL = MONGODB_URL=mongodb://mongodb:27017/js_dashboard
+
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
